@@ -1,19 +1,20 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ProductCard from "../components/ProductCard";
 import { useDispatch, useSelector } from "react-redux";
 import Modal from "../components/Modal";
-import Test from "../components/Test";
 import Input from "../components/Input";
 import Button from "../components/Button";
-import { createDataFunc } from "../redux/dataSlice";
+import { createDataFunc, updateDataFunc } from "../redux/dataSlice";
 import { modalFunc } from "../redux/modalSlice";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const Product = () => {
   const { modal } = useSelector((state) => state.modal);
   const { data } = useSelector((state) => state.data);
 
   const dispatch = useDispatch();
-
+  const location = useLocation();
+  const navigate = useNavigate();
   const [productInfo, setProductInfo] = useState({
     name: "",
     price: "",
@@ -31,14 +32,29 @@ const Product = () => {
     }
   };
 
+  let loc = location?.search.split("=")[1];
+
+  useEffect(() => {
+    if (loc) {
+      setProductInfo(data.find((dt) => dt.id == loc));
+    }
+  }, [loc]);
+
   const buttonFunc = () => {
     dispatch(createDataFunc({ ...productInfo, id: data.length + 1 }));
     dispatch(modalFunc());
   };
 
+  const buttonUpdateFunc = () => {
+    dispatch(updateDataFunc({ ...productInfo, id: loc }));
+    dispatch(modalFunc());
+    navigate("/");
+  };
+
   const contentModal = (
     <>
       <Input
+        value={productInfo.name}
         type={"text"}
         placeholder={"Ürün Ekle"}
         name={"name"}
@@ -46,6 +62,7 @@ const Product = () => {
         onChange={(e) => onChangeFunc(e, "name")}
       />
       <Input
+        value={productInfo.price}
         type={"text"}
         placeholder={"Fiyat Ekle"}
         name={"price"}
@@ -59,7 +76,10 @@ const Product = () => {
         id={"url"}
         onChange={(e) => onChangeFunc(e, "url")}
       />
-      <Button btnText={"Ürün oluştur"} onClick={buttonFunc} />
+      <Button
+        btnText={loc ? "Ürün Güncelle" : "Ürün oluştur"}
+        onClick={loc ? buttonUpdateFunc : buttonFunc}
+      />
     </>
   );
   return (
@@ -69,7 +89,12 @@ const Product = () => {
           <ProductCard key={i} dt={dt} />
         ))}
       </div>
-      {modal && <Modal content={contentModal} title={"Ürün oluştur"} />}
+      {modal && (
+        <Modal
+          content={contentModal}
+          title={loc ? "Ürün Güncelle" : "Ürün oluştur"}
+        />
+      )}
     </div>
   );
 };
