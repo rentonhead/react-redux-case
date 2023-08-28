@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   data: [],
+  keyword: "",
 };
 
 export const dataSlice = createSlice({
@@ -15,9 +16,9 @@ export const dataSlice = createSlice({
       state.data = [
         ...state.data.sort((a, b) =>
           action.payload == "asc"
-            ? a - b
+            ? a.price - b.price
             : action.payload == "desc"
-            ? b - a
+            ? b.price - a.price
             : null
         ),
       ];
@@ -32,6 +33,9 @@ export const dataSlice = createSlice({
         ),
       ];
     },
+    searchDataFunc: (state, action) => {
+      state.keyword = action.payload;
+    },
   },
 });
 
@@ -41,6 +45,7 @@ export const {
   deleteDataFunc,
   updateDataFunc,
   sortingDataFunc,
+  searchDataFunc,
 } = dataSlice.actions;
 
 export default dataSlice.reducer;

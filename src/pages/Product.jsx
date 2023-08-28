@@ -10,7 +10,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 const Product = () => {
   const { modal } = useSelector((state) => state.modal);
-  const { data } = useSelector((state) => state.data);
+  const { data, keyword } = useSelector((state) => state.data);
 
   const dispatch = useDispatch();
   const location = useLocation();
@@ -82,10 +82,14 @@ const Product = () => {
       />
     </>
   );
+
+  const filteredItems = data.filter((dt) =>
+    dt.name.toLowerCase().includes(keyword.toLowerCase())
+  );
   return (
     <div>
       <div className="flex items-center flex-wrap">
-        {data?.map((dt, i) => (
+        {filteredItems?.map((dt, i) => (
           <ProductCard key={i} dt={dt} />
         ))}
       </div>
